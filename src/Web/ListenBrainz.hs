@@ -27,6 +27,7 @@ module Web.ListenBrainz
   , getListens
 
     -- ** Retrieving Import Timestamps
+  , LatestImport(..)
   , getLatestImport
 
     -- ** Updating Import Timestamps
@@ -39,7 +40,12 @@ module Web.ListenBrainz
   , ListenBrainzAPICall(..)
   , ListenBrainzT(..)
   , performAPICall
+
+    -- ** Servant API
   , ListenBrainzAPI
+  , Authorization(..)
+  , TimeStamp(..)
+  , UserName(..)
   ) where
 
 import Control.Monad
