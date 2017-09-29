@@ -1,5 +1,5 @@
 name:                listenbrainz-client
-version:             1.0.1
+version:             1.1.0
 synopsis:            A client library to the ListenBrainz project
 homepage:            https://github.com/ocharles/listenbrainz-client
 license:             BSD3
