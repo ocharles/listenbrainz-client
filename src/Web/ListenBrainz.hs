@@ -10,6 +10,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 
+-- | A basic client to interact with ListenBrainz.
 module Web.ListenBrainz
   ( MonadListenBrainz(..)
   , runListenBrainzEff
@@ -55,8 +56,9 @@ import Control.Monad.Freer
 import Control.Monad.Freer.Exception
 import Control.Monad.IO.Class
 import Control.Monad.Trans.Reader
-import Data.Aeson (FromJSON(..), ToJSON(..), (.=), (.:))
+import Data.Aeson (Object, FromJSON(..), ToJSON(..), (.=), (.:), (.:?))
 import qualified Data.Aeson as JSON
+import Data.Foldable (fold)
 import Data.Functor.Coyoneda
 import Data.Monoid
 import Data.Proxy (Proxy(..))
@@ -108,10 +110,13 @@ instance ToJSON SubmitListens where
           ]
 
 
+-- | Information about a single listen at a point in time.
 data ListenData = ListenData
   { listenListenedAt :: UTCTime
+    -- ^ When this listen was recorded.
   , listenTrackMetadata :: TrackMetadata
-  } deriving (Eq, Ord, Read, Show, Generic)
+    -- ^ Information about the track that was listened to.
+  } deriving (Eq, Read, Show, Generic)
 
 
 instance ToJSON ListenData where
@@ -134,18 +139,27 @@ instance FromJSON ListenData where
       pure ListenData{..}
 
 
+-- | Metadata about a track that was listened to.
 data TrackMetadata = TrackMetadata
   { trackArtist :: Text
   , trackName :: Text
-  } deriving (Eq, Ord, Read, Show, Generic)
+  , trackReleaseName :: Maybe Text
+    -- ^ The name of the release this recording was played from.
+  , trackAdditionalInfo :: Object
+    -- ^ Arbitrary and unstructured extra information. For more information, see the [ListenBrainz documentation](https://listenbrainz.readthedocs.io/en/production/dev/json.html#payload-json-details).
+  } deriving (Eq, Read, Show, Generic)
 
 
 instance ToJSON TrackMetadata where
   toJSON TrackMetadata {..} =
     JSON.object
-      [ "artist_name" .= trackArtist
-      , "track_name" .= trackName
-      ]
+      (concat
+        [ [ "artist_name" .= trackArtist
+          , "track_name" .= trackName
+          , "additional_info" .= trackAdditionalInfo
+          ]
+        , foldMap (pure . ("release_name" .=)) trackReleaseName
+        ])
 
 
 instance FromJSON TrackMetadata where
@@ -156,6 +170,12 @@ instance FromJSON TrackMetadata where
 
       trackName <-
         o .: "track_name"
+
+      trackReleaseName <-
+        o .:? "release_name"
+
+      trackAdditionalInfo <-
+        fmap fold (o .:? "additional_info")
 
       pure TrackMetadata{..}
 
