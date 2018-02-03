@@ -1,5 +1,5 @@
 name:                listenbrainz-client
-version:             1.1.0
+version:             1.1.1
 synopsis:            A client library to the ListenBrainz project
 homepage:            https://github.com/ocharles/listenbrainz-client
 license:             BSD3
@@ -14,7 +14,7 @@ cabal-version:       >=1.10
 library
   exposed-modules:     Web.ListenBrainz
   build-depends:       aeson >= 1.0.2.1,
-                       base >=4.9 && <4.10,
+                       base >=4.9 && <4.11,
                        free >= 4.12.4,
                        freer-effects >= 0.3.0.1,
                        http-client >= 0.5.7.0,

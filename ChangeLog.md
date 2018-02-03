@@ -1,3 +1,9 @@
+# 1.1.1
+
+## Other Changes
+
+* Increased upper bound of `base` to allow 4.10.
+
 # 1.1.0
 
 ## Breaking Changes
